@@ -29,7 +29,7 @@ typedef void (^filePickerCallback)(__strong NSString* path);
 - (void)saveFile;
 @end
 
-void et::alert(const std::string& title, const std::string& message, const std::string& button, AlertType type)
+void et::alert(const std::string& title, const std::string& message, const std::string& button, AlertType)
 {
 #if (__MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_10)
 	NSAlert* alert = [[NSAlert alloc] init];
@@ -99,6 +99,8 @@ std::string et::selectFile(const StringList& allowedTypes, SelectFileMode mode, 
 
 - (BOOL)panel:(id)sender shouldEnableURL:(NSURL*)url
 {
+	(void)sender;
+	
 	NSError* error = nil;
 	NSDictionary* resourceValues = [url resourceValuesForKeys:@[NSURLIsRegularFileKey, NSURLIsDirectoryKey] error:&error];
 	
@@ -119,12 +121,6 @@ std::string et::selectFile(const StringList& allowedTypes, SelectFileMode mode, 
 
 - (void)openFile
 {
-#if defined(ET_CONSOLE_APPLICATION)
-	
-	_callback([NSString string]);
-	
-#else
-	
 	NSOpenPanel* openDlg = [NSOpenPanel openPanel];
 	[openDlg setDelegate:self];
 	[openDlg setCanChooseFiles:YES];
@@ -133,23 +129,13 @@ std::string et::selectFile(const StringList& allowedTypes, SelectFileMode mode, 
 	[openDlg setResolvesAliases:YES];
 	
 	_callback([openDlg runModal] ? [[[openDlg URLs] objectAtIndex:0] path] : [NSString string]);
-	
-#endif
 }
 
 - (void)saveFile
 {
-#if defined(ET_CONSOLE_APPLICATION)
-	
-	_callback([NSString string]);
-	
-#else
-	
 	NSSavePanel* saveDlg = [NSSavePanel savePanel];
 	[saveDlg setNameFieldStringValue:_defaultName];
 	_callback([saveDlg runModal] ? [[saveDlg URL] path] : [NSString string]);
-	
-#endif
 }
 
 @end

@@ -83,6 +83,7 @@ void Application::loaded()
 Application::~Application()
 {
 	platformFinalize();
+	exitRunLoop();
 }
 
 void Application::quit(int code)
@@ -190,6 +191,7 @@ void Application::enableRemoteNotifications()
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent
 {
+	(void)replyEvent;
 	NSString* eventURL = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
 	if ([eventURL length] == 0) return;
 	
@@ -201,6 +203,7 @@ void Application::enableRemoteNotifications()
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
 {
+	(void)notification;
 	_launchingFinished = NO;
 	
 	_scheduledURLs = [[NSMutableArray alloc] init];
@@ -255,6 +258,7 @@ void Application::enableRemoteNotifications()
 
 - (void)applicationWillTerminate:(NSNotification*)notification
 {
+	(void)notification;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)sender
@@ -265,6 +269,7 @@ void Application::enableRemoteNotifications()
 
 - (void)application:(NSApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
+	(void)application;
 	BinaryDataStorage dataWrapper(reinterpret_cast<const unsigned char*>([deviceToken bytes]), [deviceToken length]);
 	
 	Dictionary event;
@@ -276,16 +281,18 @@ void Application::enableRemoteNotifications()
 
 - (void)application:(NSApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-	Dictionary event;
+	(void)application;
 	
+	Dictionary event;
 	event.setStringForKey(kSystemEventType, kSystemEventRemoteNotificationStatusChanged);
 	event.setStringForKey("error", std::string([[error localizedDescription] UTF8String]));
-	
 	et::application().systemEvent.invokeInMainRunLoop(event);
 }
 
 - (void)application:(NSApplication*)application didReceiveRemoteNotification:(NSDictionary*)userInfo
 {
+	(void)application;
+	
 	NSError* error = nil;
 	NSData* jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:NSJSONWritingPrettyPrinted error:&error];
 	if (jsonData != nil)

@@ -37,7 +37,7 @@ ParticleSystem::ParticleSystem(RenderContext* rc, size_t maxSize, const std::str
 	_vertexData = va->generateDescription();
 	
 	_timer.expired.connect(this, &ParticleSystem::onTimerUpdated);
-	_timer.start(mainTimerPool(), 0.0f, NotifyTimer::RepeatForever);
+	_timer.start(currentTimerPool(), 0.0f, NotifyTimer::RepeatForever);
 }
 
 ParticleSystem* ParticleSystem::duplicate()
@@ -51,7 +51,8 @@ void ParticleSystem::onTimerUpdated(NotifyTimer* timer)
 	_emitter.update(timer->actualTime());
 	
 	_rc->renderState().bindVertexArray(_vao);
-	void* bufferData = bufferData = _vao->vertexBuffer()->map(0, _vertexData.data.dataSize(), MapBufferMode::WriteOnly);
+	void* bufferData = bufferData = _vao->vertexBuffer()->map(0, _vertexData.data.dataSize(),
+		MapBufferOptions::Write | MapBufferOptions::InvalidateBuffer);
 
 	auto posOffset = _decl.elementForUsage(VertexAttributeUsage::Position).offset();
 	auto clrOffset = _decl.elementForUsage(VertexAttributeUsage::Color).offset();
